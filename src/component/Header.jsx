@@ -1,8 +1,18 @@
+/* eslint-disable react/prop-types */
 /* eslint-disable no-unused-vars */
-import { Link } from 'react-router-dom';
+import { Link, Navigate, useNavigate, useSearchParams } from 'react-router-dom';
 import {FaSignInAlt, FaSignOutAlt, FaUser} from 'react-icons/fa'
 
-function Header() {
+function Header({setIsAuthenticated}) {
+  const navigate = useNavigate()
+
+    const handleLogout = () =>{
+    localStorage.removeItem('token')
+    setIsAuthenticated(false)
+    navigate('/login')
+    console.log('Déconnexion avec succès')
+  }
+
   return (
     <>
     <header className="header">
@@ -20,10 +30,10 @@ function Header() {
               <FaUser/> Login
             </Link>
           </li>
-          <li>
-            {/* <Link to="/register">
-              <FaSignOutAlt/>
-           </Link> */}
+          <li onClick={handleLogout}>
+            <Link to="/login">
+              <FaSignOutAlt/> Logout
+            </Link>
           </li>
         </ul>
     </header>

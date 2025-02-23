@@ -2,8 +2,12 @@
 import axios from 'axios'
 import jwt from 'jsonwebtoken'
 
-const registerUser = ()=>{
-  const {name, email, password} = userData
+const getCurrentUser = async (userData)=>{
+  const response = await axios.post("http://localhost:5000/api/users/register")
+  return response.data
+}
 
-  const token = jwt.generateToken()
+const loginUser = async (userData) =>{
+  const response = axios.post("http://localhost:5000/api/users/login")
+  return response.data
 }
