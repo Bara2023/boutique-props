@@ -66,5 +66,5 @@ export const getCurrentUser = expressAsyncHandler (async (req, res) =>{
     name: req.user.name,
     email:req.user.email
   }
-  res.status(400).json(user)
+  res.status(200).json(user)
 })

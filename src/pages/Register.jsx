@@ -1,6 +1,9 @@
 /* eslint-disable no-unused-vars */
 import { useState, useEffect } from "react"
 import { FaUser } from "react-icons/fa"
+import axios from "axios"
+import {toast} from "react-toastify"
+import {ToastContainer} from "react-toastify"
 
 function Register() {
   const [formData, setFormData] = useState({
@@ -18,6 +21,13 @@ function Register() {
     }))
   }
 
+  const onSubmit = async (e)=>{
+    e.preventDefault()
+    const response = await axios.post("http://localhost:5000/api/users/register", formData)
+    toast.success('user enregistré avec succès !')
+    console.log(formData)
+  }
+
   return (
     <>
       <section className="heading">
@@ -26,7 +36,7 @@ function Register() {
       </section>
 
       <section className="form">
-        <form >
+        <form onSubmit={onSubmit}>
           <div className="form-group">
             <input
              type="text"
@@ -58,8 +68,13 @@ function Register() {
              onChange={onChange}
              />
           </div>
+
+          <div className="form-group">
+            <button className="btn btn-block">Submit</button>
+          </div>
         </form>
       </section>
+      <ToastContainer/>
     </>
   )
 }

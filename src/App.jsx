@@ -1,24 +1,31 @@
-import './App.css';
-import Home from './pages/Home.jsx';
-import Register from './pages/Register.jsx'
-import Login from "./pages/Login.jsx"
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Header from './component/Header.jsx';
+import { useState, useEffect } from "react";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import Home from "./pages/Home";
+import Register from "./pages/Register";
+import Login from "./pages/Login";
+import Dashboard from "./pages/Dashboard";
+import Header from "./component/Header";
 
 function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    setIsAuthenticated(!!token); // ✅ Vérifie le token au chargement
+  }, []);
+
   return (
-    <>
-      <Router>
-        <div className="container">
-          <Header />
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/register" element={<Register />} />
-              <Route path="/login" element={<Login />} />
-            </Routes>
-        </div>
-      </Router>
-    </>
+    <Router>
+      <div className="container">
+        <Header setIsAuthenticated={setIsAuthenticated} />
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/login" element={<Login setIsAuthenticated={setIsAuthenticated} />} />
+          <Route path="/dashboard" element={isAuthenticated ? <Dashboard /> : <Navigate to="/login" />} />
+        </Routes>
+      </div>
+    </Router>
   );
 }
 
