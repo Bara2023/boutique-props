@@ -405,6 +405,20 @@ footer {
   }
 }
 
+.centered-div {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 20px; /* Vous pouvez ajuster la valeur de la marge selon vos besoins */
+}
+
+.centered-div .btn {
+  margin: 10px;
+  padding: 5px 15px;
+  font-size: 13px;
+  background-color:rgb(82, 136, 98)
+}
+
 /*
 @media (prefers-color-scheme: light) {
   :root {

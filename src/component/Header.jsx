@@ -2,6 +2,7 @@
 /* eslint-disable no-unused-vars */
 import { Link, Navigate, useNavigate, useSearchParams } from 'react-router-dom';
 import {FaSignInAlt, FaSignOutAlt, FaUser} from 'react-icons/fa'
+import { MdDashboard } from "react-icons/md"
 
 function Header({setIsAuthenticated}) {
   const navigate = useNavigate()
@@ -33,6 +34,11 @@ function Header({setIsAuthenticated}) {
           <li onClick={handleLogout}>
             <Link to="/login">
               <FaSignOutAlt/> Logout
+            </Link>
+          </li>
+          <li>
+            <Link to="/dashboard">
+             <MdDashboard/> Dashboard
             </Link>
           </li>
         </ul>

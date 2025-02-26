@@ -1,36 +1,29 @@
-/* eslint-disable no-undef */
 /* eslint-disable no-unused-vars */
-import jwt from 'jsonwebtoken'
-import expressAsyncHandler from 'express-async-handler'
-import User from '../model/userModel.js'
+/* eslint-disable no-undef */
+import jwt from 'jsonwebtoken';
+import User from '../model/userModel.js';
 
-export const protect = expressAsyncHandler(async (req, res, next) => {
-  let token; // Déclaration au début
+ const protect = async (req, res, next) => {
+  const authHeader = req.headers.authorization;
 
-  try {
-    // Récupérer le token des headers
-    if (req.headers.authorization && req.headers.authorization.startsWith("Bearer")) {
-      token = req.headers.authorization.split(' ')[1]; // Assignation
-    }
-
-    if (!token) {
-      res.status(401);
-      throw new Error('Not authorized, no token');
-    }
-
-    // Vérifier le token
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-    // Récupérer l'utilisateur à partir du token
-    req.user = await User.findById(decoded.id).select("-password");
-
-    next();
-  } catch (error) {
-    console.log(error);
-    res.status(401);
-    throw new Error('Not authorized');
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({ message: 'Aucun token fourni.' });
   }
-});
 
-export default protect;
+  const token = authHeader.split(' ')[1]
+  try {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      const user = await User.findById(decoded.id).select('-password');
 
+      if (!user) {
+          return res.status(401).json({ message: 'Utilisateur non trouvé.' });
+      }
+
+      req.user = user; // Assigne l'utilisateur à req.user
+      next();
+  } catch (error) {
+      return res.status(401).json({ message: 'Token invalide.' });
+  }
+};
+
+export default protect

@@ -4,6 +4,7 @@ import { FaUser } from "react-icons/fa"
 import axios from "axios"
 import {toast} from "react-toastify"
 import {ToastContainer} from "react-toastify"
+import { Navigate, useNavigate } from "react-router-dom"
 
 function Register() {
   const [formData, setFormData] = useState({
@@ -21,10 +22,14 @@ function Register() {
     }))
   }
 
+  const navigate = useNavigate()
   const onSubmit = async (e)=>{
     e.preventDefault()
     const response = await axios.post("http://localhost:5000/api/users/register", formData)
     toast.success('user enregistré avec succès !')
+    setTimeout(() => {
+      navigate("/dashboard")
+    }, 1000);
     console.log(formData)
   }
 

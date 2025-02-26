@@ -1,28 +1,49 @@
 /* eslint-disable no-unused-vars */
 import { useState } from "react";
+import axios from "axios";
 
 function CreateProduct() {
   const [formData, setFormData] = useState({
     name: "",
     price: "",
     offer: false,
-    user: "",
   });
 
-  const { name, price, offer, user } = formData;
+  const { name, price, offer } = formData;
 
   const onChange = (e) => {
     const value = e.target.type === "checkbox" ? e.target.checked : e.target.value;
 
     setFormData((prevState) => ({
       ...prevState,
-      [e.target.name]: value,
+      [e.target.name]: value, // Mise à jour de la valeur correcte pour le champ
     }));
   };
 
-  const onSubmit = (e) => {
+  const onSubmit = async (e) => {
     e.preventDefault();
-    console.log(formData); // Pour vérifier les données soumises
+    console.log("Données du produit: ", formData);
+
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      console.error("Erreur: Vous devez être connecté pour créer un produit.");
+      alert("Vous devez être connecté pour créer un produit.")
+      return // Empêche l'exécution de la requête
+    }
+
+    try {
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      };
+
+      const response = await axios.post("http://localhost:5000/api/products", formData, config);
+      console.log("Produit créé: ", response.data);
+    } catch (error) {
+      console.error("Erreur lors de la création du produit: ", error);
+    }
   };
 
   return (
@@ -34,7 +55,7 @@ function CreateProduct() {
             className="form-control"
             name="name"
             id="name"
-            placeholder="Please enter a name"
+            placeholder="Veuillez entrer un nom"
             value={name}
             onChange={onChange}
           />
@@ -44,37 +65,21 @@ function CreateProduct() {
             className="form-control"
             name="price"
             id="price"
-            placeholder="Please enter a price"
+            placeholder="Veuillez entrer un prix"
             value={price}
             onChange={onChange}
           />
 
-          {/* Champ checkbox pour l'offre */}
           <div className="form-group">
             <label>
               Offer:
-              <input
-                type="checkbox"
-                name="offer"
-                checked={offer}
-                onChange={onChange}
-              />
+              <input type="checkbox" name="offer" checked={offer} onChange={onChange} />
             </label>
           </div>
 
-          <input
-            type="text"
-            className="form-control"
-            name="user"
-            id="user"
-            placeholder="Please enter a user name"
-            value={user}
-            onChange={onChange}
-          />
-
           <div className="form-group">
             <button type="submit" className="btn btn-block">
-              Submit
+              Soumettre
             </button>
           </div>
         </form>
