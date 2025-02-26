@@ -1,70 +1,87 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-undef */
-import expressAsyncHandler from 'express-async-handler'
-import User from '../model/userModel.js'
-import bcrypt from 'bcryptjs'
-import jwt from 'jsonwebtoken'
+import expressAsyncHandler from 'express-async-handler';
+import User from '../model/userModel.js';
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
 
-export const registerUser = expressAsyncHandler(async (req, res)=>{
-  const {name, email, password} = req.body
+// ✅ Enregistrement d'un utilisateur
+export const registerUser = expressAsyncHandler(async (req, res) => {
+  const { name, email, password } = req.body;
 
-  const userExists = await User.findOne({email})
+  console.log("📩 Tentative d'inscription :", email);
+
+  const userExists = await User.findOne({ email });
 
   if (userExists) {
-    res.status(400)
-    return console.log('user déjà existant, veuillez vous connecter');
-  } else {
-    const salt = await bcrypt.genSalt(10)
-    const hashedPassword = await bcrypt.hash(password, salt)
+    console.log("🚨 Utilisateur déjà existant :", email);
+    return res.status(400).json({ message: 'Utilisateur déjà existant, veuillez vous connecter' });
+  }
 
-    const newUser = await User.create({
-      name,
-      email,
-      password: hashedPassword
-    })
+  const salt = await bcrypt.genSalt(10);
+  const hashedPassword = await bcrypt.hash(password, salt);
 
-    if (newUser) {
-      res.status(201).json({
+  const newUser = await User.create({
+    name,
+    email,
+    password: hashedPassword,
+  });
+
+  if (newUser) {
+    console.log("✅ Utilisateur créé :", newUser.email);
+    res.status(201).json({
       _id: newUser._id,
       name: newUser.name,
       email: newUser.email,
       token: generateToken(newUser._id),
-      message: 'user successfully created !'
-      })
-    }
+      message: 'Utilisateur créé avec succès !',
+    });
+  } else {
+    res.status(500).json({ message: "Erreur lors de l'inscription" });
   }
-})
+});
 
-export const loginUser = expressAsyncHandler (async (req, res)=>{
-  const {email, password} = req.body
+// ✅ Connexion d'un utilisateur
+export const loginUser = expressAsyncHandler(async (req, res) => {
+  const { email, password } = req.body;
 
-  const user = await User.findOne({email})
+  console.log("🔑 Tentative de connexion :", email);
 
-  if (user && (await bcrypt.compare(password, user.password  ))) {
+  const user = await User.findOne({ email });
+
+  if (user && (await bcrypt.compare(password, user.password))) {
+    console.log("✅ Connexion réussie :", email);
     res.status(200).json({
       _id: user._id,
+      name: user.name,
       email: user.email,
       token: generateToken(user._id),
-      message: 'user successfully connected !'
-    })
+      message: 'Utilisateur connecté avec succès !',
+    });
   } else {
-    res.status(400).json({
-      message: "email ou mot de passe incorrect"
-    })
+    console.log("Connexion échouée :", email);
+    res.status(400).json({ message: "Email ou mot de passe incorrect" });
   }
-})
+});
 
+// Génération du token JWT
 export const generateToken = (id) => {
-  return jwt.sign({id}, process.env.JWT_SECRET, {
-    expiresIn: "30d"
-  })
-}
+  return jwt.sign({ id }, process.env.JWT_SECRET, {
+    expiresIn: "30d",
+  });
+};
 
-export const getCurrentUser = expressAsyncHandler (async (req, res) =>{
-  const user = {
+// Récupération de l'utilisateur courant (nécessite `protect`)
+export const getCurrentUser = expressAsyncHandler(async (req, res) => {
+  if (!req.user) {
+    return res.status(401).json({ message: "Utilisateur non trouvé" });
+  }
+
+  console.log("🆔 Utilisateur actuel :", req.user.email);
+
+  res.status(200).json({
     id: req.user._id,
     name: req.user.name,
-    email:req.user.email
-  }
-  res.status(200).json(user)
-})
+    email: req.user.email,
+  });
+});

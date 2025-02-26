@@ -4,6 +4,7 @@ import mongoose from 'mongoose';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import userRoutes from './routes/userRoutes.js';
+import productRoutes from './routes/productRoutes.js';
 import errorHandler from './middleware/errorMiddleware.js';
 
 dotenv.config();
@@ -17,6 +18,7 @@ app.use(cors());
 
 // Routes
 app.use('/api/users', userRoutes);
+app.use('/api/products', productRoutes);
 
 // Error handling middleware
 app.use(errorHandler);
